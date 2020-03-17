@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 
@@ -209,18 +208,16 @@ public class RowMap implements Serializable {
 			MaxwellJson.writeValueToJSON(g, outputConfig.includesNulls, FieldNames.PRIMARY_KEY_COLUMNS, pkColumns);
 		}
 
-		if ( outputConfig.excludeColumns.size() > 0 ) {
+		if ( outputConfig.exclusion != null ) {
 			// NOTE: to avoid concurrent modification.
 			Set<String> keys = new HashSet<>();
 			keys.addAll(this.data.keySet());
 			keys.addAll(this.oldData.keySet());
 
-			for ( Pattern p : outputConfig.excludeColumns ) {
-				for ( String key : keys ) {
-					if ( p.matcher(key).matches() ) {
-						this.data.remove(key);
-						this.oldData.remove(key);
-					}
+			for ( String key : keys ) {
+				if (outputConfig.exclusion.includes(database, table, key)) {
+					this.data.remove(key);
+					this.oldData.remove(key);
 				}
 			}
 		}

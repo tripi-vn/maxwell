@@ -5,9 +5,9 @@ import com.zendesk.maxwell.filtering.Filter;
 import com.zendesk.maxwell.producer.EncryptionMode;
 import com.zendesk.maxwell.producer.MaxwellOutputConfig;
 import com.zendesk.maxwell.row.RowMap;
+import com.zendesk.maxwell.row.exclusion.Exclusion;
 import com.zendesk.maxwell.schema.SchemaStoreSchema;
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.ResultSet;
@@ -274,7 +274,7 @@ public class MaxwellIntegrationTest extends MaxwellTestWithIsolatedServer {
 		assertTrue(Pattern.compile("\"account_id\":2").matcher(json).find());
 
 		MaxwellOutputConfig outputConfig = new MaxwellOutputConfig();
-		outputConfig.excludeColumns.add(Pattern.compile("id"));
+		outputConfig.exclusion = new Exclusion("id");
 
 		list = getRowsForSQL(filter, insertSQL, createDBs);
 		json = list.get(1).toJSON(outputConfig);

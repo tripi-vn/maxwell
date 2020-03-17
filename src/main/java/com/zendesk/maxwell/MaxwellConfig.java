@@ -11,12 +11,10 @@ import com.zendesk.maxwell.producer.MaxwellOutputConfig;
 import com.zendesk.maxwell.producer.ProducerFactory;
 import com.zendesk.maxwell.replication.BinlogPosition;
 import com.zendesk.maxwell.replication.Position;
+import com.zendesk.maxwell.row.exclusion.Exclusion;
 import com.zendesk.maxwell.scripting.Scripting;
 import com.zendesk.maxwell.util.AbstractConfig;
 import com.zendesk.maxwell.util.MaxwellOptionParser;
-import joptsimple.BuiltinHelpFormatter;
-import joptsimple.OptionDescriptor;
-import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -813,12 +811,10 @@ public class MaxwellConfig extends AbstractConfig {
 		}
 
 		if ( this.excludeColumns != null ) {
-			for ( String s : this.excludeColumns.split(",") ) {
-				try {
-					outputConfig.excludeColumns.add(compileStringToPattern(s));
-				} catch ( InvalidFilterException e ) {
-					usage("invalid exclude_columns: '" + this.excludeColumns + "': " + e.getMessage());
-				}
+			try {
+				outputConfig.exclusion = new Exclusion(this.excludeColumns);
+			} catch ( InvalidFilterException e ) {
+				usage("invalid exclude_columns: '" + this.excludeColumns + "': " + e.getMessage());
 			}
 		}
 

@@ -1,6 +1,7 @@
 package com.zendesk.maxwell.filtering;
 
 import com.amazonaws.util.StringInputStream;
+import com.zendesk.maxwell.util.ConfigParser;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,20 +16,20 @@ import static java.io.StreamTokenizer.*;
 public class FilterParser {
 	private StreamTokenizer tokenizer;
 	private InputStreamReader inputStream;
-	private final String input;
-
+	protected final String input;
 	public FilterParser(String input) {
 		this.input = input;
 	}
 
 	public List<FilterPattern> parse() throws InvalidFilterException {
 		try {
-			this.inputStream = new InputStreamReader(new StringInputStream(input));
+			inputStream = new InputStreamReader(new StringInputStream(input));
 		} catch ( UnsupportedEncodingException e ) {
 			throw new InvalidFilterException(e.getMessage());
 		}
 
-		this.tokenizer = new StreamTokenizer(inputStream);
+		this.tokenizer = ConfigParser.initTokenizer(inputStream);
+
 		try {
 			return doParse();
 		} catch ( IOException e ) {
@@ -38,16 +39,6 @@ public class FilterParser {
 
 	private List<FilterPattern> doParse() throws IOException {
 		ArrayList<FilterPattern> patterns = new ArrayList<>();
-		tokenizer.ordinaryChar('.');
-		tokenizer.ordinaryChar('/');
-		tokenizer.wordChars('_', '_');
-
-		tokenizer.ordinaryChars('0', '9');
-		tokenizer.wordChars('0', '9');
-
-		tokenizer.quoteChar('`');
-		tokenizer.quoteChar('\'');
-		tokenizer.quoteChar('"');
 
 		tokenizer.nextToken();
 
@@ -64,7 +55,6 @@ public class FilterParser {
 		}
 		tokenizer.nextToken();
 	}
-
 
 	private FilterPattern parseFilterPattern() throws IOException {
 		FilterPatternType type;
@@ -93,9 +83,9 @@ public class FilterParser {
 
 
 		skipToken(':');
-		Pattern dbPattern = parsePattern();
+		Pattern dbPattern = ConfigParser.parsePattern(inputStream, tokenizer);
 		skipToken('.');
-		Pattern tablePattern = parsePattern();
+		Pattern tablePattern = ConfigParser.parsePattern(inputStream, tokenizer);
 
 		if ( tokenizer.ttype == '.' ) {
 			// column-value filter
@@ -108,7 +98,7 @@ public class FilterParser {
 			tokenizer.nextToken();
 
 			skipToken('=');
-			Pattern valuePattern = parsePattern();
+			Pattern valuePattern = ConfigParser.parsePattern(inputStream, tokenizer);
 			ret = new FilterColumnPattern(type, dbPattern, tablePattern, columnName, valuePattern);
 		} else {
 			ret = new FilterPattern(type, dbPattern, tablePattern);
@@ -121,39 +111,5 @@ public class FilterParser {
 		return ret;
 	}
 
-	private Pattern parsePattern() throws IOException {
-		Pattern pattern;
-		switch ( tokenizer.ttype ) {
-			case '/':
-				pattern = Pattern.compile(parseRegexp());
-				break;
-			case '*':
-				pattern = Pattern.compile("");
-				break;
-			case TT_WORD:
-			case '`':
-			case '\'':
-			case '"':
-				pattern = Pattern.compile("^" + tokenizer.sval + "$");
-				break;
-			default:
-				throw new IOException("Expected string or regexp, saw '" + Character.toString((char) tokenizer.ttype));
-		}
-		tokenizer.nextToken();
-		return pattern;
-	}
 
-	private String parseRegexp() throws IOException {
-		char ch, lastChar = 0;
-		String s = "";
-		while ( true ) {
-			ch = (char) inputStream.read();
-			if ( ch == '/' && lastChar != '\\' )
-				break;
-
-			s += ch;
-			lastChar = ch;
-		}
-		return s;
-	}
 }

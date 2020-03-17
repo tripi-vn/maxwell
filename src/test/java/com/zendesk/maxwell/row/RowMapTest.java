@@ -2,18 +2,18 @@ package com.zendesk.maxwell.row;
 
 import com.zendesk.maxwell.MaxwellTestJSON;
 import com.zendesk.maxwell.errors.ProtectedAttributeNameException;
+import com.zendesk.maxwell.filtering.InvalidFilterException;
 import com.zendesk.maxwell.producer.MaxwellOutputConfig;
 import com.zendesk.maxwell.replication.BinlogPosition;
 import com.zendesk.maxwell.replication.Position;
+import com.zendesk.maxwell.row.exclusion.Exclusion;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class RowMapTest {
 
@@ -127,7 +127,7 @@ public class RowMapTest {
 		rowMap.putData("last_name", "bar");
 		rowMap.putData("rawJSON", new RawJSONString("{\"UserID\":20}"));
 
-		MaxwellOutputConfig outputConfig = getMaxwellOutputConfig();
+		MaxwellOutputConfig outputConfig = getMaxwellOutputConfig("");
 
 		Assert.assertEquals("{\"database\":\"MyDatabase\",\"table\":\"MyTable\",\"type\":\"insert\"," +
 				"\"ts\":1496712943,\"position\":\"binlog-0001:1\",\"gtid\":null,\"server_id\":7653213," +
@@ -155,7 +155,7 @@ public class RowMapTest {
 		rowMap.putData("last_name", "bar");
 		rowMap.putData("interests", Arrays.asList("hiking", "programming"));
 
-		MaxwellOutputConfig outputConfig = getMaxwellOutputConfig(Pattern.compile("^.*name.*$"));
+		MaxwellOutputConfig outputConfig = getMaxwellOutputConfig("*.*name");
 
 		Assert.assertEquals("{\"database\":\"MyDatabase\",\"table\":\"MyTable\",\"type\":\"insert\"," +
 				"\"ts\":1496712943,\"position\":\"binlog-0001:1\",\"gtid\":null,\"server_id\":7653213," +
@@ -164,7 +164,7 @@ public class RowMapTest {
 				":[\"hiking\",\"programming\"]}}", rowMap.toJSON(outputConfig));
 	}
 
-	private MaxwellOutputConfig getMaxwellOutputConfig(Pattern... patterns) {
+	private MaxwellOutputConfig getMaxwellOutputConfig(String patterns) throws InvalidFilterException {
 		MaxwellOutputConfig outputConfig = new MaxwellOutputConfig();
 
 		outputConfig.includesBinlogPosition = true;
@@ -176,7 +176,7 @@ public class RowMapTest {
 		outputConfig.includesNulls = true;
 		outputConfig.includesPrimaryKeys = true;
 		outputConfig.includesPrimaryKeyColumns = true;
-		outputConfig.excludeColumns = Arrays.asList(patterns);
+		outputConfig.exclusion = new Exclusion(patterns);
 
 		return outputConfig;
 	}

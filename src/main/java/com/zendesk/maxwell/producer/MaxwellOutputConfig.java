@@ -1,8 +1,6 @@
 package com.zendesk.maxwell.producer;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
+import com.zendesk.maxwell.row.exclusion.Exclusion;
 
 
 public class MaxwellOutputConfig {
@@ -18,7 +16,7 @@ public class MaxwellOutputConfig {
 	public boolean includesPrimaryKeys;
 	public boolean includesPrimaryKeyColumns;
 	public boolean outputDDL;
-	public List<Pattern> excludeColumns;
+	public Exclusion exclusion;
 	public EncryptionMode encryptionMode;
 	public String secretKey;
 	public boolean zeroDatesAsNull;
@@ -36,7 +34,7 @@ public class MaxwellOutputConfig {
 		this.includesPrimaryKeyColumns = false;
 		this.outputDDL = false;
 		this.zeroDatesAsNull = false;
-		this.excludeColumns = new ArrayList<>();
+		this.exclusion = null;
 		this.encryptionMode = EncryptionMode.ENCRYPT_NONE;
 		this.secretKey = null;
 	}
