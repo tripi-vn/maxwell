@@ -44,20 +44,6 @@ public class ConfigParser {
 		return pattern;
 	}
 
-	private static String parseRegexp(InputStreamReader inputStream, StreamTokenizer tokenizer) throws IOException {
-		char ch, lastChar = 0;
-		String s = "";
-		while ( true ) {
-			ch = (char) inputStream.read();
-			if ( (ch == '.' || ch == '$') && lastChar != '\\' )
-				break;
-
-			s += ch;
-			lastChar = ch;
-		}
-		return s;
-	}
-
 	private static String parseRegexp(InputStreamReader inputStream) throws IOException {
 		char ch, lastChar = 0;
 		String s = "";
