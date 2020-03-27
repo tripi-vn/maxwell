@@ -106,7 +106,7 @@ public class FilterParser {
 
 			String columnName = tokenizer.sval;
 			Pattern columnPattern = parsePattern();
-			if (tokenizer.ttype == TT_EOF) {
+			if (tokenizer.ttype != TT_WORD) {
 				ret = new FilterPattern(type, dbPattern, tablePattern, columnPattern);
 			} else {
 				skipToken('=');
