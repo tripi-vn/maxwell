@@ -21,15 +21,15 @@ public class TableCache {
 				return;
 			}
 
+			boolean include = filter.includes(dbName, tblName);
 			Database db = schema.findDatabase(dbName);
-			if ( db == null )
-				throw new RuntimeException("Couldn't find database " + dbName);
-			else {
+			if ( db == null ) {
+				if (include) throw new RuntimeException("Couldn't find database " + dbName);
+			} else {
 				Table tbl = db.findTable(tblName);
-
-				if (tbl == null)
-					throw new RuntimeException("Couldn't find table " + tblName + " in database " + dbName);
-				else
+				if (tbl == null) {
+					if (include) throw new RuntimeException("Couldn't find table " + tblName + " in database " + dbName);
+				} else
 					tableMapCache.put(tableId, tbl);
 			}
 		}

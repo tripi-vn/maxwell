@@ -16,3 +16,4 @@ config/*.yml
 .factorypath
 .sts4-cache/
 out/
+*.example
