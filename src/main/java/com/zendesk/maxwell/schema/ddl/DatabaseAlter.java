@@ -16,12 +16,21 @@ public class DatabaseAlter extends SchemaChange {
 		return new ResolvedDatabaseAlter(this.database, this.charset);
 	}
 
+//	@Override
+//	public boolean isBlacklisted(Filter filter) {
+//		if ( filter == null ) {
+//			return false;
+//		} else {
+//			return filter.isDatabaseBlacklisted(database);
+//		}
+//	}
+
 	@Override
-	public boolean isBlacklisted(Filter filter) {
+	public boolean isIgnored(Filter filter) {
 		if ( filter == null ) {
 			return false;
 		} else {
-			return filter.isDatabaseBlacklisted(database);
+			return filter.isDatabaseBlacklisted(database) || filter.excludes(database);
 		}
 	}
 }

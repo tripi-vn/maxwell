@@ -70,12 +70,21 @@ public class TableCreate extends SchemaChange {
 		resolved.setDefaultColumnCharsets();
 	}
 
+//	@Override
+//	public boolean isBlacklisted(Filter filter) {
+//		if ( filter == null ) {
+//			return false;
+//		} else {
+//			return filter.isTableBlacklisted(this.database, this.table);
+//		}
+//	}
+
 	@Override
-	public boolean isBlacklisted(Filter filter) {
+	public boolean isIgnored(Filter filter) {
 		if ( filter == null ) {
 			return false;
 		} else {
-			return filter.isTableBlacklisted(this.database, this.table);
+			return filter.isTableBlacklisted(this.database, this.table) || filter.excludes(this.database, this.table);
 		}
 	}
 

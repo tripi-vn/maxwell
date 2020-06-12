@@ -115,6 +115,8 @@ public abstract class SchemaChange {
 			}
 		}
 	}
+	// Apply for Vntravel
+	// public abstract boolean isBlacklisted(Filter filter);
 
-	public abstract boolean isBlacklisted(Filter filter);
+	public abstract boolean isIgnored(Filter filter);
 }

@@ -28,12 +28,21 @@ public class DatabaseCreate extends SchemaChange {
 		return new ResolvedDatabaseCreate(database, chset);
 	}
 
+//	@Override
+//	public boolean isBlacklisted(Filter filter) {
+//		if ( filter == null ) {
+//			return false;
+//		} else {
+//			return filter.isDatabaseBlacklisted(database);
+//		}
+//	}
+
 	@Override
-	public boolean isBlacklisted(Filter filter) {
+	public boolean isIgnored(Filter filter) {
 		if ( filter == null ) {
 			return false;
 		} else {
-			return filter.isDatabaseBlacklisted(database);
+			return filter.isDatabaseBlacklisted(database) || filter.excludes(database);
 		}
 	}
 

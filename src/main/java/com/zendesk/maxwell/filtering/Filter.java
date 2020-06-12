@@ -80,6 +80,24 @@ public class Filter {
 		return false;
 	}
 
+	public boolean excludes(String database) {
+		FilterResult match = new FilterResult();
+
+		for ( FilterPattern p : patterns )
+			p.ignore(database, match);
+
+		return match.include;
+	}
+
+
+	public boolean excludes(String database, String table) {
+		FilterResult match = new FilterResult();
+
+		for ( FilterPattern p : patterns )
+			p.ignore(database, table, match);
+
+		return match.include;
+	}
 
 	public boolean isTableBlacklisted(String database, String table) {
 		if ( isSystemBlacklisted(database, table) )

@@ -1,6 +1,5 @@
 package com.zendesk.maxwell.filtering;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -20,14 +19,24 @@ public class FilterPattern {
 		this.columnPattern = columnPattern;
 	}
 
+	protected boolean appliesTo(String database) {
+		return database == null || dbPattern.matcher(database).find();
+	}
+
 	protected boolean appliesTo(String database, String table) {
 		return (database == null || dbPattern.matcher(database).find())
 			&& (table == null || tablePattern.matcher(table).find());
 	}
+
 	protected boolean appliesTo(String database, String table, String column) {
 		return (database == null || dbPattern.matcher(database).find())
 				&& (table == null || tablePattern.matcher(table).find())
 				&& (column == null || columnPattern == null || columnPattern.matcher(column).find());
+	}
+
+	public void match(String database, FilterResult match) {
+		if ( appliesTo(database) )
+			match.include = (this.type == FilterPatternType.INCLUDE);
 	}
 
 	public void match(String database, String table, FilterResult match) {
@@ -38,6 +47,16 @@ public class FilterPattern {
 	public void match(String database, String table, String column, FilterResult match) {
 		if ( appliesTo(database, table, column) )
 			match.include = (this.type == FilterPatternType.INCLUDE);
+	}
+
+	public void ignore(String database, FilterResult match) {
+		if ( appliesTo(database) )
+			match.include = (this.type == FilterPatternType.EXCLUDE);
+	}
+
+	public void ignore(String database, String table, FilterResult match) {
+		if ( appliesTo(database, table) )
+			match.include = (this.type == FilterPatternType.EXCLUDE);
 	}
 
 	public void matchValue(String database, String table, Map<String, Object> data, FilterResult match) {

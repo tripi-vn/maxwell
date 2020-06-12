@@ -20,12 +20,21 @@ public class DatabaseDrop extends SchemaChange {
 		return new ResolvedDatabaseDrop(this.database);
 	}
 
+//	@Override
+//	public boolean isBlacklisted(Filter filter) {
+//		if ( filter == null ) {
+//			return false;
+//		} else {
+//			return filter.isDatabaseBlacklisted(database);
+//		}
+//	}
+
 	@Override
-	public boolean isBlacklisted(Filter filter) {
+	public boolean isIgnored(Filter filter) {
 		if ( filter == null ) {
 			return false;
 		} else {
-			return filter.isDatabaseBlacklisted(database);
+			return filter.isDatabaseBlacklisted(database) || filter.excludes(database);
 		}
 	}
 
